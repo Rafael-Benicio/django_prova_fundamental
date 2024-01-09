@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+     <title>Document</title>
+</head>
+<body>
+     <header>
+          <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+               <div class="container-fluid">
+                    <a class="navbar-brand" href="">Provas Escolares</a>
+                    <a class="navbar-brand" href="{% url 'school_test:logout' %}">Sair</a>
+               </div>
+          </nav>
+     <header>
+     
+     {% if student_tests %}
+          <table class="table table-striped">
+               {% for test in student_tests %}
+                    <tr>
+                         {% if test.was_done %}
+                              <td>{{ test.test_name }}</td>
+                              <td>{{test.grade}}</td>
+                         {% else %}
+                              <td><a class="link-success link-offset-2 link-underline link-underline-opacity-25"  href="prova/{{test.id}}" >{{ test.test_name }}<a></td>
+                              <td> Não feito </td>
+                         {% endif %}
+                    <tr>
+               {% endfor %}
+          </table>
+     {% else %}
+     <p>Não há testes para serem feitos.</p>
+     {% endif %}
+</body>
+</html>
+

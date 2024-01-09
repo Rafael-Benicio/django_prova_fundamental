@@ -1,0 +1,8 @@
+# Dev archives
+devPython
+.env
+
+# Generated files
+staticfiles
+db.sqlite3
+__pycache__
