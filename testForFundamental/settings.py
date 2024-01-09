@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ['DEBUG'])
+DEBUG = os.environ['DEBUG'] == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -121,9 +121,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = 'staticfiles'
 
-STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
 
 CSRF_TRUSTED_ORIGINS = ['https://web-production-03fe4.up.railway.app']
 
