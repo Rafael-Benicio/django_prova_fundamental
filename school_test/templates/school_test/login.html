@@ -8,25 +8,27 @@
     <title>Login</title>
 </head>
 <body>
-    <form class="mx-5 mt-3" action="{% url 'school_test:validate' %}" method="post">
-        <legend >Login de Aluno</legend>
-        <fieldset>
-            {% csrf_token %}
-            {% if error_message %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error_message }}
+    <form class="d-flex justify-content-center my-5 " action="{% url 'school_test:validate' %}" method="post">
+        <div class="w-50 border rounded border-dark p-5">
+            <legend >Login de Aluno</legend>
+            <fieldset>
+                {% csrf_token %}
+                {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error_message }}
+                    </div>
+                {% endif %}
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="id_student">Id de Estudante: </label>
+                    <input class="form-control" id="id_student" type="text" name="id_student" value="{{current_id}}">
                 </div>
-            {% endif %}
-            <div class="mb-3">
-                <label class="form-label" for="id_student">Id de Estudante: </label>
-                <input class="form-control" id="id_student" type="text" name="id_student" value="{{current_id}}">
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="password">Senha: </label>
-                <input class="form-control" id="password" type="password" name="password" value="{{current_password}}">
-            </div>
-            <input class="btn btn-primary" type="submit" value="OK">
-        </fieldset>
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="password">Senha: </label>
+                    <input class="form-control" id="password" type="password" name="password" value="{{current_password}}">
+                </div>
+                <input class="btn btn-primary" type="submit" value="Login">
+            </fieldset>
+        </div>
      </form>
 </body>
 </html>

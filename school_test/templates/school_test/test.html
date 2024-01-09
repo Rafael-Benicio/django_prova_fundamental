@@ -8,9 +8,9 @@ integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2
      <title>Prova</title>
 </head>
 <body>
-     <div class="mx-3">
-          <legend>{{test.name}}</legend>
-          <legend>{{test.subject}}</legend>
+     <div class="mx-5">
+          <h1>{{test.name}}</h1>
+          <h3>{{test.subject}}</h3>
           <form action="{% url 'school_test:result' %}" method="post">
                </fieldset>
                     <input type="hidden" id="id_studet" name="id_student" value="{{test.id_student}}">
