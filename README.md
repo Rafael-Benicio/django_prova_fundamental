@@ -21,6 +21,13 @@
   export PGPASSWORD='####'
   export PGHOST='####'
   export PGPORT='####'
+
+
+- Faz as configurações de variaveis relativas ao Django
+
+  ~~~bash
+  export SECRET_KEY='####'
+  export DEBUG='####'
   ~~~
 
   > Ou então configure um de sua preferencia no arquivo `testForFundamental/settings.py`

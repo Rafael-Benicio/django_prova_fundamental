@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rklpa2a9-o=5(oi@ew)134t9l66f(rcl!$(8ah1@5-6gg5f*_e'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ['DEBUG'])
 
 ALLOWED_HOSTS = ['*']
 
@@ -124,6 +124,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
+
+CSRF_TRUSTED_ORIGINS = ['https://web-production-03fe4.up.railway.app']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
