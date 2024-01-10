@@ -19,7 +19,7 @@ class AcessePagesTestCase(TestCase):
      def test_acesse_home_page_without_autentication(self):
           client=Client()
           response=client.get(reverse("school_test:home"))
-          self.assertEqual(response.status_code,302)
+          self.assertEqual(response.status_code,401)
 
      def test_redirect_student_to_home_page(self):
           Student.objects.create(first_name='Rafael',last_name='Benicio',password='abc123456')
@@ -32,7 +32,7 @@ class AcessePagesTestCase(TestCase):
      def test_redirect_not_authenticated_acesse_in_result(self):
           client=Client()
           response=client.get(reverse("school_test:result",))
-          self.assertEqual(response.status_code,302)
+          self.assertEqual(response.status_code,403)
 
      def test_redirect_not_authenticated_acesse_in_logout(self):
           client=Client()
