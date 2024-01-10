@@ -11,7 +11,7 @@
      <header>
           <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
                <div class="container-fluid">
-                    <a class="navbar-brand" href="">Provas Escolares</a>
+                    <a class="navbar-brand" href="">Provas Escolares de : {{student_tests.name_student}} </a>
                     <a class="navbar-brand" href="{% url 'school_test:logout' %}">Sair</a>
                </div>
           </nav>
@@ -19,7 +19,7 @@
      
      {% if student_tests %}
           <table class="table table-striped">
-               {% for test in student_tests %}
+               {% for test in student_tests.associated_tests %}
                     <tr>
                          {% if test.was_done %}
                               <td>{{ test.test_name }}</td>
