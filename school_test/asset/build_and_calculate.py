@@ -35,7 +35,7 @@ def build_list_of_tests(id_student:int)-> list[dict]:
           test_object={"test_name":test_entity.test_name}
           test_object["subject"]=test_entity.subject
           test_object["id"]=test_entity.id
-          test_object["grade"]=testtodo_object.grade
+          test_object["grade"]=f'{testtodo_object.grade:.2f}'
           test_object["was_done"]=testtodo_object.was_done
 
           student_and_associated_tests['associated_tests'].append(test_object)
