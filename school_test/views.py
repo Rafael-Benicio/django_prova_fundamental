@@ -33,17 +33,17 @@ def home(request)->HttpResponse:
           return render(request,"school_test/login.html",{"error_message": "Ocorreu algum erro com seu acesso","current_id":'',"current_password":''},status=401)
      else:
           context = {"student_tests": build_data.build_list_of_tests(id_student)}
-          return render(request,"school_test/home.html",context)
+          return render(request,"school_test/home.html",context,status=200)
 
 def student_test(request,id_test:int)->HttpResponse:
      try:
           id_student= int(request.COOKIES['id_student_cookie'])
      except KeyError as err:
           print(f' Erro, Cookie : {err} not finded')
-          return HttpResponseRedirect(reverse("school_test:login",))
+          return render(request,"school_test/login.html",{"error_message": "Ocorreu algum erro com seu acesso","current_id":'',"current_password":''},status=401)
      else:
           context = {"test": build_data.build_student_test(id_student,id_test)}
-          return render(request,"school_test/test.html",context)
+          return render(request,"school_test/test.html",context,status=200)
      
 
 def result_calculate(request)->HttpResponse:
