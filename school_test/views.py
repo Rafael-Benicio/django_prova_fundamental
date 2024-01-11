@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponse,HttpResponseRedirect
 # Create your views here.
-from .models import Student
+from .models import Student,TestToDo
 
 from .asset import build_data_of_pages as build_data
 from .asset import calculate_test_result as calculate_test
@@ -39,6 +39,10 @@ def home(request)->HttpResponse:
 def student_test(request,id_test:int)->HttpResponse:
      try:
           id_student= int(request.COOKIES['id_student_cookie'])
+          student_test=TestToDo.objects.get(id_student=int(request.COOKIES['id_student_cookie']),id_test=id_test)
+     except TestToDo.DoesNotExist as cont_not_exist:
+          print(f' Erro, student test not finded : {cont_not_exist}')
+          return HttpResponseRedirect(reverse("school_test:home",))
      except KeyError as err:
           print(f' Erro, Cookie : {err} not finded')
           return lr.redirect_user_to_login_page(request,"Ocorreu algum erro com seu acesso")
