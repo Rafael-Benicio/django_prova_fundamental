@@ -45,6 +45,7 @@ def build_list_of_tests(id_student:int)-> list[dict]:
 def build_student_test(id_student:int,id_test:int)->dict:
      questions=[]
      student_test=ReadyTest.objects.get(id=int(id_test))
+     student=Student.objects.get(id=id_student)
 
      id_from_question_and_readytest=TestQuestions.objects.filter(id_test=id_test)
      for testquestion_object in id_from_question_and_readytest:
@@ -53,6 +54,7 @@ def build_student_test(id_student:int,id_test:int)->dict:
      test={'name':student_test.test_name, }
      test['id_student']=id_student
      test['id_test']=id_test
+     test['name_student']=f"{student.first_name} {student.last_name}"
      test['subject']=student_test.subject
      test['questions']=questions
      return test
