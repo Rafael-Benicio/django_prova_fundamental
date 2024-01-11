@@ -4,7 +4,9 @@ from django.urls import reverse
 from django.http import HttpResponse,HttpResponseRedirect
 # Create your views here.
 from .models import Student
-from .asset.build_and_calculate import *
+
+from .asset import build_data_of_pages as build_data
+from .asset import calculate_test_result as calculate_test
 
 def login(request)->HttpResponse:
      return render(request, "school_test/login.html")
@@ -30,7 +32,7 @@ def home(request)->HttpResponse:
           print(f' Erro, Cookie : {err} not finded')
           return render(request,"school_test/login.html",{"error_message": "Ocorreu algum erro com seu acesso","current_id":'',"current_password":''},status=401)
      else:
-          context = {"student_tests": build_list_of_tests(id_student)}
+          context = {"student_tests": build_data.build_list_of_tests(id_student)}
           return render(request,"school_test/home.html",context)
 
 def student_test(request,id_test:int)->HttpResponse:
@@ -40,14 +42,14 @@ def student_test(request,id_test:int)->HttpResponse:
           print(f' Erro, Cookie : {err} not finded')
           return HttpResponseRedirect(reverse("school_test:login",))
      else:
-          context = {"test": build_student_test(id_student,id_test)}
+          context = {"test": build_data.build_student_test(id_student,id_test)}
           return render(request,"school_test/test.html",context)
      
 
 def result_calculate(request)->HttpResponse:
      try: 
-          grade=calculate_test_grade(remove_identification_data(request.POST))
-          regist_student_test_grade(request.POST,grade)
+          grade=calculate_test.calculate_test_grade(calculate_test.remove_identification_data(request.POST))
+          calculate_test.regist_student_test_grade(request.POST,grade)
           return HttpResponseRedirect(reverse("school_test:home",))
      except:
           return render(request,"school_test/login.html",{"error_message": "Ocorreu algum erro com seu acesso","current_id":'',"current_password":''},status=403)
