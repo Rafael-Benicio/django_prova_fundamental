@@ -9,6 +9,7 @@ class AcessePagesTestCase(TestCase):
      def setUp(self):
           self.client=Client()
           self.student=Student.objects.create(first_name='Rafael',last_name='Benicio',password='abc123456')
+          self.student_2=Student.objects.create(first_name='Lucas',last_name='Germania',password='123abcdef')
           self.question=Question.objects.create(question_text='Em Python, qual dos seguintes métodos é usado para converter um objeto em uma string?',question_subject='Python',difficulty_level=2,op1='to_string()',op2='str()',op3='convert_str()',op4='stringify()',answer=2)
           self.test=ReadyTest.objects.create(test_name='Prova de Python',subject='Python',test_descripition='Quero saber o quanto você sabe de Python')
           self.test_question=TestQuestions.objects.create(id_question=self.question,id_test=self.test)
@@ -46,6 +47,11 @@ class AcessePagesTestCase(TestCase):
           self.client.cookies=SimpleCookie({'id_student_cookie': str(self.student.id)})
           response=self.client.get(reverse('school_test:test', args=[self.test.id,]))
           self.assertEqual(response.status_code,200)
+
+     def test_access_test_page_with_authentication_but_not_having_to_do_the_test(self):
+          self.client.cookies=SimpleCookie({'id_student_cookie': str(self.student_2.id)})
+          response=self.client.get(reverse('school_test:test', args=[self.test.id,]))
+          self.assertEqual(response.status_code,302)
 
      def test_acesse_test_page_without_autentication(self):
           response=self.client.get(reverse('school_test:test', args=[self.test.id,]))
