@@ -3,6 +3,7 @@ import datetime
 from django.db import models
 from django.utils.timezone import now
 from django.db.models.signals import pre_save
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -22,12 +23,9 @@ class Question(models.Model):
         return f"{self.question_text} | {self.question_subject} |Dif {self.difficulty_level}"
 
 # Aluno (Id_Aluno,Nome_Aluno, Sobrenome_Aluno,Senha, Id_Classe)
-class Student(models.Model):
-     first_name=models.CharField(max_length=20,null=False)
-     last_name=models.CharField(max_length=20,null=False)
-     password=models.CharField(max_length=100,null=False)
+class Student(User):
      def __str__(self):
-        return f"ID : {self.id} | Aluno : {self.first_name} {self.last_name}"
+        return f"ID : {self.id} | Aluno : {self.get_full_name()}"
 
 # Prova(Id_Prova, Nome_Prova ,Materia)
 class ReadyTest(models.Model):
