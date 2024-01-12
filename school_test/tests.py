@@ -8,8 +8,8 @@ from http.cookies import SimpleCookie
 class AcessePagesTestCase(TestCase):
      def setUp(self):
           self.client=Client()
-          self.student=Student.objects.create(first_name='Rafael',last_name='Benicio',password='abc123456')
-          self.student_2=Student.objects.create(first_name='Lucas',last_name='Germania',password='123abcdef')
+          self.student=Student.objects.create(first_name='Rafael',last_name='Benicio',password='abc123456',username="rafael")
+          self.student_2=Student.objects.create(first_name='Lucas',last_name='Germania',password='123abcdef',username='luquinhas1234')
           self.question=Question.objects.create(question_text='Em Python, qual dos seguintes métodos é usado para converter um objeto em uma string?',question_subject='Python',difficulty_level=2,op1='to_string()',op2='str()',op3='convert_str()',op4='stringify()',answer=2)
           self.test=ReadyTest.objects.create(test_name='Prova de Python',subject='Python',test_descripition='Quero saber o quanto você sabe de Python')
           self.test_question=TestQuestions.objects.create(id_question=self.question,id_test=self.test)
