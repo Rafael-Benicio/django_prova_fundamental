@@ -1,10 +1,10 @@
-from ..models import Student, TestToDo, ReadyTest, Question, TestQuestions
+from ..models import Question, ReadyTest, TestQuestions, TestToDo, User
 
 
 def build_list_of_tests(id_student: int) -> list[dict]:
     student_and_associated_tests = {"name_student": "", "associated_tests": []}
 
-    student = Student.objects.get(id=id_student)
+    student = User.objects.get(id=id_student)
     student_and_associated_tests[
         "name_student"
     ] = f"{student.first_name} {student.last_name}"
@@ -27,7 +27,7 @@ def build_list_of_tests(id_student: int) -> list[dict]:
 def build_student_test(id_student: int, id_test: int) -> dict:
     questions = []
     student_test = ReadyTest.objects.get(id=int(id_test))
-    student = Student.objects.get(id=id_student)
+    student = User.objects.get(id=id_student)
 
     id_from_question_and_readytest = TestQuestions.objects.filter(id_test=id_test)
     for testquestion_object in id_from_question_and_readytest:
