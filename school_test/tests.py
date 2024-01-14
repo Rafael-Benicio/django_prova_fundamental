@@ -1,19 +1,28 @@
-from django.test import TestCase
-from django.test import Client
-from .models import Student, Question, ReadyTest, TestQuestions, TestToDo
+from django.contrib.auth import get_user
+from django.test import Client, TestCase
 from django.urls import reverse
-from http.cookies import SimpleCookie
+
+from .models import Question, ReadyTest, Student, TestQuestions, TestToDo
 
 
 class AcessePagesTestCase(TestCase):
     def setUp(self):
         self.client = Client()
+
         self.student = Student.objects.create(
-            first_name="Rafael", last_name="Benicio", password="abc123456"
+            first_name="Rafael",
+            last_name="Benicio",
+            password="abc123456",
+            username="Rafaelzinho",
         )
+
         self.student_2 = Student.objects.create(
-            first_name="Lucas", last_name="Germania", password="123abcdef"
+            first_name="Lucas",
+            last_name="Germania",
+            password="123abcdef",
+            username="Luquinhas123",
         )
+
         self.question = Question.objects.create(
             question_text="Em Python, qual dos seguintes métodos é usado para converter um objeto em uma string?",
             question_subject="Python",
@@ -36,110 +45,115 @@ class AcessePagesTestCase(TestCase):
             id_test=self.test, id_student=self.student
         )
 
+        self.student.save()
+        self.student_2.save()
+        self.question.save()
+        self.test.save()
+        self.test_question.save()
+        self.test_to_do.save()
+
     def test_acesse_login_page(self):
-        response = self.client.get(
-            reverse(
-                "school_test:login",
-            )
-        )
+        response = self.client.get(reverse("school_test:login"))
+
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_to_admin_page(self):
         response = self.client.get("/admin")
+
         self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.url, "/admin/")
 
-    def test_acesse_home_page_without_autentication(self):
-        response = self.client.get(reverse("school_test:home"))
-        self.assertEqual(response.status_code, 401)
+    def test_redirect_student_with_right_infos_to_home_page(self):
+        login_form = {"username": "Rafaelzinho", "password": "abc123456"}
 
-    def test_acesse_home_page_with_autentication(self):
-        self.client.cookies = SimpleCookie({"id_student_cookie": str(self.student.id)})
-        response = self.client.get(reverse("school_test:home"))
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(reverse("school_test:validate"), login_form)
 
-    def test_redirect_student_with_right_password_to_home_page(self):
-        form = {"id_student": str(self.student.id), "password": "abc123456"}
-        response = self.client.post(
-            reverse(
-                "school_test:validate",
-            ),
-            form,
-        )
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("school_test:home"))
 
     def test_redirect_student_with_wrong_password_to_login_page(self):
-        form = {"id_student": str(self.student.id), "password": "abc123459"}
-        response = self.client.post(
-            reverse(
-                "school_test:validate",
-            ),
-            form,
-        )
-        self.assertEqual(response.status_code, 401)
+        login_form = {"username": "Rafaelzinho", "password": "abc1ddd23459"}
+
+        response = self.client.post(reverse("school_test:validate"), login_form)
+
+        self.assertEqual(response.url, reverse("school_test:login"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_redirect_student_with_wrong_username_to_login_page(self):
+        login_form = {"username": "o", "password": "abc123456"}
+
+        response = self.client.post(reverse("school_test:validate"), login_form)
+
+        self.assertEqual(response.url, reverse("school_test:login"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_redirect_acesse_in_home_page_without_autentication(self):
+        response = self.client.get(reverse("school_test:home"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/school_test/login/?next=/school_test/home/")
+
+    def test_acesse_home_page_with_autentication(self):
+        login_form = {"username": "Rafaelzinho", "password": "abc123456"}
+
+        response = self.client.post(reverse("school_test:validate"), login_form)
+
+        self.assertEqual(response.url, reverse("school_test:home"))
+        self.assertEqual(response.status_code, 302)
 
     def test_acesse_test_page_with_autentication(self):
-        self.client.cookies = SimpleCookie({"id_student_cookie": str(self.student.id)})
-        response = self.client.get(
-            reverse(
-                "school_test:test",
-                args=[
-                    self.test.id,
-                ],
-            )
-        )
+        login_form = {"username": "Rafaelzinho", "password": "abc123456"}
+
+        self.client.force_login(self.student)
+        self.client.post(reverse("school_test:validate"), login_form)
+
+        response = self.client.get(reverse("school_test:test", args=[self.test.id]))
+
         self.assertEqual(response.status_code, 200)
 
     def test_access_test_page_with_authentication_but_not_having_to_do_the_test(self):
-        self.client.cookies = SimpleCookie(
-            {"id_student_cookie": str(self.student_2.id)}
-        )
-        response = self.client.get(
-            reverse(
-                "school_test:test",
-                args=[
-                    self.test.id,
-                ],
-            )
-        )
-        self.assertEqual(response.status_code, 302)
+        login_form = {"username": "Luquinhas123", "password": "123abcdef"}
 
-    def test_acesse_test_page_without_autentication(self):
-        response = self.client.get(
-            reverse(
-                "school_test:test",
-                args=[
-                    self.test.id,
-                ],
-            )
+        self.client.force_login(self.student_2)
+        self.client.post(reverse("school_test:validate"), login_form)
+
+        response = self.client.get(reverse("school_test:test", args=[self.test.id]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("school_test:home"))
+
+    def test_redirect_acesse_in_test_page_without_autentication(self):
+        response = self.client.get(reverse("school_test:test", args=[self.test.id]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            f"/school_test/login/?next=/school_test/home/prova/{self.test.id}",
         )
-        self.assertEqual(response.status_code, 401)
 
     def test_redirect_not_expected_acesse_in_result_path(self):
-        response = self.client.get(
-            reverse(
-                "school_test:result",
-            )
-        )
-        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse("school_test:result"))
+
+        self.assertEqual(response.url, "/school_test/login/?next=/school_test/result/")
+        self.assertEqual(response.status_code, 302)
 
     def test_redirect_expected_acesse_in_result_path(self):
-        form = {
+        test_form = {
             "id_student": str(self.student.id),
             "id_test": str(self.test.id),
             str(self.question.id): "2",
         }
-        response = self.client.post(
-            reverse(
-                "school_test:result",
-            ),
-            form,
-        )
-        self.assertEqual(response.status_code, 302)
+        login_form = {"username": "Luquinhas123", "password": "123abcdef"}
 
-    def test_redirect_not_authenticated_acesse_in_logout(self):
-        response = self.client.get(
-            reverse(
-                "school_test:logout",
-            )
-        )
+        self.client.force_login(self.student)
+        self.client.post(reverse("school_test:validate"), login_form)
+
+        response = self.client.post(reverse("school_test:result"), test_form)
+
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("school_test:home"))
+
+    def test_redirect_acesse_in_logout(self):
+        response = self.client.get(reverse("school_test:logout"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("school_test:login"))
