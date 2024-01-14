@@ -1,101 +1,75 @@
-from argon2 import PasswordHasher
-
-from django.shortcuts import render
-from django.urls import reverse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
+from django.urls import reverse
 
-from .models import Student, TestToDo
-
+from .models import TestToDo
 from .utils import build_data_of_pages as build_data
 from .utils import calculate_test_result as calculate_test
-from .utils import login_redirect as lr
 
 
-def login(request) -> HttpResponse:
+def user_login(request) -> HttpResponse:
     return render(request, "school_test/login.html")
 
 
-def user_login_validate(request) -> HttpResponse:
-    ph = PasswordHasher()
-    id_student = request.POST["id_student"]
+def user_login_validate(request) -> HttpResponseRedirect:
     try:
-        student_entity = Student.objects.get(id=int(id_student))
-        if not (ph.verify(student_entity.password, request.POST["password"])):
-            raise "Wrong Password"
-    except:
-        return lr.redirect_user_to_login_page(
-            request,
-            "Seu Id ou Senha estão errados",
-            request.POST["id_student"],
-        )
+        username = request.POST["username"]
+        password = request.POST["password"]
+
+        user = authenticate(request, username=username, password=password)
+
+        if user == None:
+            raise Exception("wrong username or passoword")
+
+    except Exception as err:
+        print(f"Login Erro : {err}")
+        return redirect(reverse("school_test:login"))
     else:
-        response = HttpResponseRedirect(
-            reverse(
-                "school_test:home",
-            )
-        )
-        response.set_cookie("id_student_cookie", request.POST["id_student"])
-        return response
+        request.session["user_id"] = user.id
+        login(request, user)
+        return redirect(reverse("school_test:home"))
 
 
+@login_required(login_url="/school_test/login/")
 def home(request) -> HttpResponse:
-    try:
-        id_student = int(request.COOKIES["id_student_cookie"])
-    except KeyError as err:
-        print(f" Erro, Cookie : {err} not finded")
-        return lr.redirect_user_to_login_page(
-            request, "Ocorreu algum erro com seu acesso"
+    context = {
+        "student_tests": build_data.build_list_of_tests(
+            request.session.get("user_id", None)
         )
-    else:
-        context = {"student_tests": build_data.build_list_of_tests(id_student)}
-        return render(request, "school_test/home.html", context, status=200)
+    }
+    return render(request, "school_test/home.html", context, status=200)
 
 
+@login_required(login_url="/school_test/login/")
 def student_test(request, id_test: int) -> HttpResponse:
     try:
-        id_student = int(request.COOKIES["id_student_cookie"])
-        student_test = TestToDo.objects.get(
-            id_student=int(request.COOKIES["id_student_cookie"]), id_test=id_test
-        )
+        id_student = request.session.get("user_id", None)
+        student_test = TestToDo.objects.get(id_student=id_student, id_test=id_test)
     except TestToDo.DoesNotExist as cont_not_exist:
         print(f" Erro, student test not finded : {cont_not_exist}")
-        return HttpResponseRedirect(
-            reverse(
-                "school_test:home",
-            )
-        )
-    except KeyError as err:
-        print(f" Erro, Cookie : {err} not finded")
-        return lr.redirect_user_to_login_page(
-            request, "Ocorreu algum erro com seu acesso"
-        )
+        return redirect(reverse("school_test:home"))
     else:
         context = {"test": build_data.build_student_test(id_student, id_test)}
         return render(request, "school_test/test.html", context, status=200)
 
 
-def result_calculate(request) -> HttpResponse:
+@login_required(login_url="/school_test/login/")
+def result_calculate(request) -> HttpResponseRedirect:
     try:
         grade = calculate_test.calculate_test_grade(
             calculate_test.remove_identification_data(request.POST)
         )
         calculate_test.regist_student_test_grade(request.POST, grade)
-        return HttpResponseRedirect(
-            reverse(
-                "school_test:home",
-            )
-        )
-    except:
-        return lr.redirect_user_to_login_page(
-            request, "Ocorreu algum erro com seu acesso", status_code=403
-        )
+    except Exception as err:
+        print(f"Result Erro : {err}")
+        calculate_test.enable_student_to_make_the_test(request.POST, grade)
+    finally:
+        return redirect(reverse("school_test:home"))
 
 
-def user_logout(request) -> HttpResponse:
-    response = HttpResponseRedirect(
-        reverse(
-            "school_test:login",
-        )
-    )
-    response.delete_cookie("id_student_cookie")
-    return response
+def user_logout(request) -> HttpResponseRedirect:
+    logout(request=request)
+    return redirect(reverse("school_test:login"))
