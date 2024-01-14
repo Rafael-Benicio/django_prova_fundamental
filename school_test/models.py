@@ -1,10 +1,10 @@
-from argon2 import PasswordHasher
 import datetime
 
-from django.db import models
-from django.utils.timezone import now
-from django.db.models.signals import pre_save
+from argon2 import PasswordHasher
 from django.contrib.auth.models import User
+from django.db import models
+from django.db.models.signals import pre_save
+from django.utils.timezone import now
 
 
 # Questao(Id_Questão,Texto, Op1, Op2, Op3, Op4, Materia, data, Dificuldade, Resposta)
@@ -25,12 +25,6 @@ class Question(models.Model):
         return f"{self.question_text} | {self.question_subject} |Dif {self.difficulty_level}"
 
 
-# Aluno (Id_Aluno,Nome_Aluno, Sobrenome_Aluno,Senha, Id_Classe)
-class Student(User):
-    def __str__(self):
-        return f"ID : {self.id} | Aluno : {self.get_full_name()}"
-
-
 # Prova(Id_Prova, Nome_Prova ,Materia)
 class ReadyTest(models.Model):
     test_name = models.CharField(max_length=200, null=False)
@@ -49,19 +43,9 @@ class TestQuestions(models.Model):
         return f"Questão : {self.id_question} → {self.id_test}"
 
 
-# Classes (Id_Classe, Id_Aluno ,Ano, Turma )
-class StudentClass(models.Model):
-    id_student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    year = models.IntegerField(null=False)
-    class_group = models.IntegerField(null=False)
-
-    def __str__(self):
-        return f"{self.id_student} | Classe : {self.year}.{self.class_group}"
-
-
 # ParaFazer(Id_Aluno, Id_Prova)
 class TestToDo(models.Model):
-    id_student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    id_student = models.ForeignKey(User, on_delete=models.CASCADE)
     id_test = models.ForeignKey(ReadyTest, on_delete=models.CASCADE)
     was_done = models.BooleanField(null=False, default=False)
     grade = models.FloatField(null=False, default=0)
@@ -70,17 +54,17 @@ class TestToDo(models.Model):
         return f"{self.id_student} → {self.id_test}"
 
 
-def make_password_hasher(sender, instance, **kwargs):
-    ph = PasswordHasher()
-    if not instance.id:
-        hash = ph.hash(instance.password)
-        instance.password = hash
-    else:
-        current_instance = sender.objects.get(id=instance.id)
-        if current_instance.password != instance.password:
-            hash = ph.hash(instance.password)
-            instance.password = hash
+# def make_password_hasher(sender, instance, **kwargs):
+#     ph = PasswordHasher()
+#     if not instance.id:
+#         hash = ph.hash(instance.password)
+#         instance.password = hash
+#     else:
+#         current_instance = sender.objects.get(id=instance.id)
+#         if current_instance.password != instance.password:
+#             hash = ph.hash(instance.password)
+#             instance.password = hash
 
 
-# Conecta a função ao sinal pre_save
-pre_save.connect(make_password_hasher, sender=Student)
+# # Conecta a função ao sinal pre_save
+# pre_save.connect(make_password_hasher, sender=Student)
