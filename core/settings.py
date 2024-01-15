@@ -51,7 +51,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "testForFundamental.urls"
+ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
     {
@@ -74,7 +74,7 @@ AUTHENTICATION_BACKENDS = [
     "school_test.backends.StudentBackend",
 ]
 
-WSGI_APPLICATION = "testForFundamental.wsgi.application"
+WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
