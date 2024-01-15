@@ -1,6 +1,7 @@
 import datetime
 
 from argon2 import PasswordHasher
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import pre_save
@@ -54,17 +55,16 @@ class TestToDo(models.Model):
         return f"{self.id_student} → {self.id_test}"
 
 
-# def make_password_hasher(sender, instance, **kwargs):
-#     ph = PasswordHasher()
-#     if not instance.id:
-#         hash = ph.hash(instance.password)
-#         instance.password = hash
-#     else:
-#         current_instance = sender.objects.get(id=instance.id)
-#         if current_instance.password != instance.password:
-#             hash = ph.hash(instance.password)
-#             instance.password = hash
+def make_password_hasher(sender, instance, **kwargs):
+    if not instance.id:
+        hash = make_password(instance.password)
+        instance.password = hash
+    else:
+        current_instance = sender.objects.get(id=instance.id)
+        if current_instance.password != instance.password:
+            hash = make_password(instance.password)
+            instance.password = hash
 
 
-# # Conecta a função ao sinal pre_save
-# pre_save.connect(make_password_hasher, sender=Student)
+# Conecta a função ao sinal pre_save
+pre_save.connect(make_password_hasher, sender=User)
