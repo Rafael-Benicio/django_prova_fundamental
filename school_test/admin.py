@@ -17,7 +17,7 @@ class QuestionAdmin(admin.ModelAdmin):
     fieldsets = [
         (
             "Main Infos",
-            {"fields": ["question_text", "question_subject", "difficulty_level"]},
+            {"fields": ["question_text", "question_subject"]},
         ),
         ("Option to Choice", {"fields": ["op1", "op2", "op3", "op4"]}),
         ("Answer", {"fields": ["answer"]}),

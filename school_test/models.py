@@ -19,7 +19,6 @@ class Question(models.Model):
     op4 = models.CharField(max_length=500, null=False)
 
     question_subject = models.CharField(max_length=10, null=False)
-    difficulty_level = models.IntegerField(null=False)
     answer = models.IntegerField(null=False)
 
     def __str__(self):

@@ -27,7 +27,6 @@ class AcessePagesTestCase(TestCase):
         self.question = Question.objects.create(
             question_text="Em Python, qual dos seguintes métodos é usado para converter um objeto em uma string?",
             question_subject="Python",
-            difficulty_level=2,
             op1="to_string()",
             op2="str()",
             op3="convert_str()",
