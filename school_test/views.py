@@ -47,12 +47,11 @@ def home(request) -> HttpResponse:
 def student_test(request, id_test: int) -> HttpResponse:
     try:
         id_student = request.session.get("user_id", None)
-        student_test = TestToDo.objects.get(id_student=id_student, id_test=id_test)
+        context = {"test": build_data.build_student_test(id_student, id_test)}
     except TestToDo.DoesNotExist as cont_not_exist:
         print(f" Erro, student test not finded : {cont_not_exist}")
         return redirect(reverse("school_test:home"))
     else:
-        context = {"test": build_data.build_student_test(id_student, id_test)}
         return render(request, "school_test/test.html", context, status=200)
 
 
