@@ -32,7 +32,7 @@
   export DEBUG='####'
   ```
 
-  > Ou então configure um de sua preferencia no arquivo `testForFundamental/settings.py`
+  > Ou então configure um de sua preferencia no arquivo `core/settings.py`
 
 - Rode as migrations:
 
